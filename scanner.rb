@@ -1,22 +1,22 @@
 [
-	'mechanize',
-	'json',
-	'pp'
+	'open-uri',
+	'date',
+	'json'
 ].each{|g|
 	require g
 }
 
-agent = Mechanize.new
-agent.agent.http.verify_mode = OpenSSL::SSL::VERIFY_NONE # Get around site's SSL problems
 
-url = 'https://data.cityofnewyork.us/views/INLINE/rows.json?accessType=WEBSITE&method=getByIds&asHashes=true&start=0&length=50&meta=true'
-postHash = {
-	'accessType'=>'WEBSITE',
-	'asHashes'=>'true',
-	'length'=>'50',
-	'meta'=>'true',
-	'method'=>'getByIds',
-	'start'=>'0'
-}
+baseURL = 'http://data.cityofnewyork.us/resource/y6h5-jvss.json'
+where = '?$where='
+violationDate = 'violation_date='
 
-puts agent.post(url,postHash)
+dateSuffix = 'T00:00:00'
+today = Date.today
+soQLQueryValue = '\''+today.to_s+dateSuffix+'\''
+
+# url = baseURL+where+violationDate+'\'2015-07-09T00:00:00\''
+url = baseURL+where+violationDate+soQLQueryValue
+encodedURL = URI.encode(url)
+jsonResult = open(encodedURL).read
+hashResult = JSON.parse(jsonResult)
